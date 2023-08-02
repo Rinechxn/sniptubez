@@ -14,6 +14,7 @@ import urllib.parse
 
 app = Flask(__name__)
 CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 def sanitize_filename(filename):

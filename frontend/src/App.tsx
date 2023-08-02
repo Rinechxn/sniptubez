@@ -2,7 +2,7 @@ import { useState } from 'react';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-axios.defaults.withCredentials = true;
+// axios.defaults.withCredentials = true;
 function App() {
   const [url, setUrl] = useState<string>('');
   const [audioFormat, setAudioFormat] = useState<string>('mp3');
@@ -13,7 +13,6 @@ function App() {
   const handleDownload = async () => {
     setLoading(true);
     try {
-      
       const apiUrl =  'http://localhost:5000' || import.meta.env.VITE_API_BASE_URL;
       const response = await axios.post(`${apiUrl}/download`, {
         url,
@@ -24,7 +23,6 @@ function App() {
 
       
       const fileName = response.headers["video-title"];
-
       const urldl = URL.createObjectURL(blob);
 
       const a = document.createElement('a');
