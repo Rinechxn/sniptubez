@@ -98,20 +98,6 @@ def convert_to_wav(title):
     ff.run()
     os.remove(input_file)
 
-# def serve_frontend():
-#     try:
-#         PORT = 8000
-
-
-#         os.chdir(os.path.join(ROOT_DIR, 'web'))
-
-
-#         handler = http.server.SimpleHTTPRequestHandler
-#         with socketserver.TCPServer(("", PORT), handler) as httpd:
-#             print(f"Frontend server running on http://localhost:{PORT}/")
-#             httpd.serve_forever()
-#     except Exception as e:
-#         print(f"Error serving frontend: {str(e)}")
 
 if __name__ == '__main__':
     # app.run()

@@ -2,7 +2,6 @@ import { useState } from 'react';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
 axios.defaults.withCredentials = true;
 function App() {
   const [url, setUrl] = useState<string>('');
@@ -24,7 +23,7 @@ function App() {
       const blob = new Blob([response.data], { type: `audio/${fileExtension}` });
 
       
-      const fileName = response.headers['Video-Title'];
+      const fileName = response.headers["video-title"];
 
       const urldl = URL.createObjectURL(blob);
 
