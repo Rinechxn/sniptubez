@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, request, Response
 from flask_cors import CORS
+from waitress import serve
 from pytube import YouTube
 import os
 from ffmpy import FFmpeg
@@ -15,10 +16,8 @@ app = Flask(__name__)
 CORS(app)
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
-def normalize_video_title(video_title):
-    normalized_title = unicodedata.normalize('NFKD', video_title).encode('ASCII', 'ignore').decode('ASCII')
-
-    return re.sub(r'[^\x00-\x7F]', '', normalized_title)
+def sanitize_filename(filename):
+    return re.sub(r'[\\/*?:"<>|]', '_', filename)
 
 @app.route('/download', methods=['POST'])
 def download_video():
@@ -30,8 +29,7 @@ def download_video():
         yt = YouTube(url)
 
         video_title = yt.title
-
-        video_title_normalized = normalize_video_title(video_title)
+        print(yt.title)
 
         file_extension = '' 
 
@@ -61,18 +59,17 @@ def download_video():
             response_file = file.read()
 
         os.remove(file_path)
-
-        encoded_filename = urllib.parse.quote(f'{video_title_normalized}.{file_extension}')
-
+        
         return Response(
             response=response_file,
             status=200,
             headers={
                 'Content-Type': f'audio/{file_extension}',
-                'Content-Disposition': f'attachment; filename*=utf-8\'\'{encoded_filename}',
-                'x-video-title': video_title 
+                'Content-Disposition': f'attachment; filename="{video_title}.{file_extension}"',
+                'Video-Title': video_title
             }
         )
+        
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -117,7 +114,8 @@ def convert_to_wav(title):
 #         print(f"Error serving frontend: {str(e)}")
 
 if __name__ == '__main__':
-    app.run()
+    # app.run()
+    serve(app, host='0.0.0.0', port=5000, threads=1) #WAITRESS!
 
     # flask_thread = threading.Thread(target=app.run)
     # flask_thread.start()

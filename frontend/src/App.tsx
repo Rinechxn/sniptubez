@@ -3,6 +3,7 @@ import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+axios.defaults.withCredentials = true;
 function App() {
   const [url, setUrl] = useState<string>('');
   const [audioFormat, setAudioFormat] = useState<string>('mp3');
@@ -13,16 +14,17 @@ function App() {
   const handleDownload = async () => {
     setLoading(true);
     try {
-      const response = await axios.post('http://localhost:5000/download', {
+      
+      const apiUrl =  'http://localhost:5000' || import.meta.env.VITE_API_BASE_URL;
+      const response = await axios.post(`${apiUrl}/download`, {
         url,
         audio_format: audioFormat,
       }, { responseType: 'arraybuffer' });
-
       const fileExtension = audioFormat === 'mp3' ? 'mp3' : audioFormat === 'flac' ? 'flac' : 'wav';
       const blob = new Blob([response.data], { type: `audio/${fileExtension}` });
 
-
-      const fileName = response.headers['x-video-title'];
+      
+      const fileName = response.headers['Video-Title'];
 
       const urldl = URL.createObjectURL(blob);
 
@@ -30,11 +32,14 @@ function App() {
       a.href = urldl;
       a.download = `${fileName}.${fileExtension}`;
 
+
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
 
       setMessage('Download completed successfully.');
+      toast(message)
+      console.log(fileName)
     } catch (error: any) {
       setMessage('Error: ' + error.response?.data?.error || 'Something went wrong.');
     } finally {
@@ -43,12 +48,17 @@ function App() {
   };
 
 
+
   return (
     <div className='w-screen flex flex-col items-center justify-center'>
 
-      <div className='flex'>
-        <b className="text-2xl font-semibold mb-4 dark:text-white -tracking-wide">YouTube</b>
-        <p className="text-2xl font-light mb-4 dark:text-white -tracking-wide">Downloader</p>
+      <div className='flex items-center space-x-2 mb-8'>
+        <div className='flex'>
+          <b className="text-2xl font-semibold dark:text-white -tracking-wide">YouTube</b>
+          <p className="text-2xl font-light dark:text-white -tracking-wide">Downloader</p>
+
+        </div>
+        <span className='font-bold uppercase text-[11px] bg-[#18fff3] text-black px-1 rounded-full'>beta-1.0.0</span>
       </div>
       <div className='flex'>
         <input
@@ -71,11 +81,11 @@ function App() {
               viewBox="0 0 24 24"
               className="animate-spin h-6 w-6"
               fill="none"
-              stroke="#ffffff"
+              stroke="#000000"
             >
-              <circle cx="12" cy="12" r="10" stroke="#ffffff" strokeWidth="2" />
+              <circle cx="12" cy="12" r="10" stroke="#000000" strokeWidth="2" />
               <path
-                fill="#ffffff"
+                fill="#000000"
                 d="M12 6v6l4 2"
               />
             </svg>
@@ -105,7 +115,7 @@ function App() {
           <select
             value={audioFormat}
             onChange={(e) => setAudioFormat(e.target.value)}
-            className="px-4 py-3 border-[#1b1b1b] bg-[#0e0e0e] outline-none dark:border-white placeholder:text-sm"
+            className="px-4 py-3 text-white border-[#1b1b1b] border bg-[#1a1a1a] outline-none dark:border-white placeholder:text-sm"
           >
             <option value="mp3">MP3</option>
             <option value="wav">WAV</option>
@@ -127,7 +137,6 @@ function App() {
         pauseOnHover
         theme="dark"
       />
-      {message && toast(message)}
     </div>
   );
 }
